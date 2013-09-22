@@ -27,7 +27,7 @@ func (v *View) SetCenterXY(x, y float32) {
 }
 
 func (v *View) SetCenter(center Vector2) {
-	v.SetCenterXY(center.X, center.X)
+	v.SetCenterXY(center.X, center.Y)
 }
 
 func (v *View) SetSizeXY(w, h float32) {

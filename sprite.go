@@ -23,11 +23,11 @@ func (s *Sprite) Render(t *RenderTarget, states RenderStates) {
 }
 
 func (s *Sprite) SetTexture(t *Texture) {
-	s.SetRect(Rect{0, 0, t.Size().X, t.Size().Y})
+	s.SetTextureRect(Rect{0, 0, t.Size().X, t.Size().Y})
 	s.texture = t
 }
 
-func (s *Sprite) SetRect(rect Rect) {
+func (s *Sprite) SetTextureRect(rect Rect) {
 	if rect != s.rect {
 		s.rect = rect
 		s.updatePositions()
