@@ -42,6 +42,14 @@ func (s *Sprite) SetColor(Color Color) {
 	s.verts[3].Color = Color
 }
 
+func (s *Sprite) Texture() *Texture {
+	return s.texture
+}
+
+func (s *Sprite) LocalBounds() Rect {
+	return s.rect
+}
+
 func (s *Sprite) updatePositions() {
 	s.verts[0].Pos = Vector2{}
 	s.verts[1].Pos = Vector2{0, s.rect.H}
