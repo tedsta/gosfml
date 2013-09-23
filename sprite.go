@@ -18,7 +18,7 @@ func NewSprite(t *Texture) *Sprite {
 
 func (s *Sprite) Render(t *RenderTarget, states RenderStates) {
 	states.Texture = s.texture
-	//states.transform.Combine(s.T.Transform())
+	//states.Transform.Combine(s.T.Transform())
 	t.Render(s.verts[:], Quads, states)
 }
 
