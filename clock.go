@@ -8,6 +8,10 @@ type Clock struct {
 	startTime time.Time
 }
 
+func NewClock() *Clock {
+	return &Clock{time.Now()}
+}
+
 func (c *Clock) ElapsedTime() time.Duration {
 	return time.Since(c.startTime)
 }

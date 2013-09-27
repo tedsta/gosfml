@@ -36,6 +36,8 @@ type RenderStates struct {
 }
 
 type RenderTarget struct {
+	Size Vector2
+
 	view        *View
 	defaultView *View
 
@@ -48,11 +50,11 @@ type RenderTarget struct {
 	vertexCache    [vertexCacheSize]Vertex // Pre-transformed vertices cache
 }
 
-func NewRenderTarget() *RenderTarget {
-	rt := &RenderTarget{}
+func NewRenderTarget(size Vector2) *RenderTarget {
+	rt := &RenderTarget{Size: size}
 	rt.glStatesSet = false
 	rt.defaultView = NewView()
-	rt.defaultView.Reset(Rect{0, 0, rt.Size().X, rt.Size().Y})
+	rt.defaultView.Reset(Rect{0, 0, rt.Size.X, rt.Size.Y})
 	rt.view = NewView()
 	*(rt.view) = *(rt.defaultView)
 	return rt
@@ -77,18 +79,14 @@ func (r *RenderTarget) DefaultView() View {
 }
 
 func (r *RenderTarget) Viewport(view *View) Rect {
-	w := r.Size().X
-	h := r.Size().Y
+	w := r.Size.X
+	h := r.Size.Y
 	viewport := view.Viewport()
 
 	return Rect{0.5 + w*viewport.Left,
 		0.5 + h*viewport.Top,
 		w * viewport.W,
 		h * viewport.H}
-}
-
-func (r *RenderTarget) Size() Vector2 {
-	return Vector2{681, 766}
 }
 
 func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states RenderStates) {
@@ -268,7 +266,7 @@ func (r *RenderTarget) resetGlStates() {
 func (r *RenderTarget) applyCurrentView() {
 	// Set the viewport
 	viewport := r.Viewport(r.view)
-	top := r.Size().Y - (viewport.Top + viewport.H)
+	top := r.Size.Y - (viewport.Top + viewport.H)
 	gl.Viewport(int(viewport.Left), int(top), int(viewport.W), int(viewport.H))
 
 	mat := r.view.Transform().Matrix
