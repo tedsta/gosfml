@@ -126,7 +126,7 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 
 	// Apply the blend mode
 	if states.BlendMode != r.lastBlendMode {
-		//r.applyBlendMode(states.blendMode)
+		//r.applyBlendMode(states.BlendMode)
 	}
 
 	// Apply the texture
