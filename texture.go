@@ -109,8 +109,8 @@ func CreateTexture(img image.Image) (*Texture, error) {
 
 	textureId := gl.GenTexture()
 	textureId.Bind(gl.TEXTURE_2D)
-	gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+	gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
 	gl.TexImage2D(gl.TEXTURE_2D, 0, 4, imgW, imgH, 0, gl.RGBA, gl.UNSIGNED_BYTE, rgbaImg.Pix)
 
