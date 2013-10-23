@@ -31,6 +31,13 @@ go get github.com/go-gl/gl
 go get github.com/go-gl/glfw3
 ```
 
+There's some known issues building Go's glfw bindings though. Here's the workaround:
+
+```
+cd $GOPATH/src/github.com/go-gl/glfw3
+CGO_CFLAGS=-ftrack-macro-expansion=0 go install
+```
+
 Note: mac users - you may need to use llvm-gcc instead of clang to build glfw, in shell, before running go get, type:
 ```
 export CC=llvm-gcc
