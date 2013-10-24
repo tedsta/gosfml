@@ -10,7 +10,7 @@ Having installed go with proper [path](http://golang.org/doc/code.html#GOPATH), 
 
 ```
 brew tap homebrew/versions
-brew install --build-bottle --static glfw3
+brew install glfw3
 brew install glew
 ```
 
