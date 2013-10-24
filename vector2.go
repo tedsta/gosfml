@@ -28,3 +28,8 @@ func (v Vector2) Div(s float32) Vector2 {
 func (v Vector2) Length() float32 {
 	return float32(math.Sqrt(float64(v.X*v.X + v.Y*v.Y)))
 }
+
+func (v Vector2) Normalize() Vector2 {
+	l := v.Length()
+	return Vector2{v.X / l, v.Y / l}
+}
