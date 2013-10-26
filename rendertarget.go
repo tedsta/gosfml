@@ -42,12 +42,16 @@ type RenderTarget struct {
 	defaultView *View
 
 	// Cache
-	glStatesSet    bool                    // Are our internal GL states set yet?
-	viewChanged    bool                    // Has the current view changed since last draw?
-	lastBlendMode  BlendMode               // Cached blending mode
-	lastTextureId  uint64                  // Cached texture
-	useVertexCache bool                    // Did we previously use the vertex cache?
-	vertexCache    [vertexCacheSize]Vertex // Pre-transformed vertices cache
+	glStatesSet    bool      // Are our internal GL states set yet?
+	viewChanged    bool      // Has the current view changed since last draw?
+	lastBlendMode  BlendMode // Cached blending mode
+	lastTextureId  uint64    // Cached texture
+	useVertexCache bool      // Did we previously use the vertex cache?
+	//vertexCache    [vertexCacheSize]Vertex // Pre-transformed vertices cache
+
+	vpCache [vertexCacheSize]Vector2
+	vcCache [vertexCacheSize]Color
+	vtCache [vertexCacheSize]Vector2
 }
 
 func NewRenderTarget(size Vector2) *RenderTarget {
@@ -61,7 +65,8 @@ func NewRenderTarget(size Vector2) *RenderTarget {
 }
 
 func (r *RenderTarget) Clear(color Color) {
-	gl.ClearColor(gl.GLclampf(color.R/255), gl.GLclampf(color.G/255), gl.GLclampf(color.B/255), gl.GLclampf(color.A/255))
+	gl.ClearColor(gl.GLclampf(float32(color.R)/255), gl.GLclampf(float32(color.G)/255),
+		gl.GLclampf(float32(color.B)/255), gl.GLclampf(float32(color.A)/255))
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 
@@ -101,14 +106,13 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 	}
 
 	// Check if the vertex count is low enough so that we can pre-transform them
-	// TODO: Fix vertex cache
-	useVertexCache := /*len(verts) <= vertexCacheSize*/ false
+	useVertexCache := len(verts) <= vertexCacheSize
 	if useVertexCache {
 		// Pre-transform the vertices and store them into the vertex cache
 		for i := 0; i < len(verts); i++ {
-			r.vertexCache[i].Pos = states.Transform.TransformPoint(verts[i].Pos)
-			r.vertexCache[i].Color = verts[i].Color
-			r.vertexCache[i].TexCoords = verts[i].TexCoords
+			r.vpCache[i] = states.Transform.TransformPoint(verts[i].Pos)
+			r.vcCache[i] = verts[i].Color
+			r.vtCache[i] = verts[i].TexCoords
 		}
 
 		// Since vertices are transformed, we must use an identity transform to render them
@@ -126,7 +130,7 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 
 	// Apply the blend mode
 	if states.BlendMode != r.lastBlendMode {
-		//r.applyBlendMode(states.BlendMode)
+		r.applyBlendMode(states.BlendMode)
 	}
 
 	// Apply the texture
@@ -144,19 +148,9 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 		applyShader(states.shader);
 	}*/
 
-	// If we pre-transform the vertices, we must use our internal vertex cache
-	if useVertexCache {
-		// ... and if we already used it previously, we don't need to set the pointers again
-		if !r.useVertexCache {
-			verts = r.vertexCache[:]
-		} else {
-			verts = nil
-		}
-	}
-
 	// #########################################
 
-	if len(verts) > 0 {
+	if !useVertexCache {
 		// Find the OpenGL primitive type
 		modes := [...]gl.GLenum{gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.TRIANGLES,
 			gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN, gl.QUADS}
@@ -166,8 +160,8 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 
 		for i, _ := range verts {
 			gl.TexCoord2f(verts[i].TexCoords.X, verts[i].TexCoords.Y)
-			gl.Color4f(verts[i].Color.R/255, verts[i].Color.G/255,
-				verts[i].Color.B/255, verts[i].Color.A/255)
+			gl.Color4f(float32(verts[i].Color.R)/255, float32(verts[i].Color.G)/255,
+				float32(verts[i].Color.B)/255, float32(verts[i].Color.A)/255)
 			gl.Vertex2f(verts[i].Pos.X, verts[i].Pos.Y)
 		}
 
@@ -177,30 +171,22 @@ func (r *RenderTarget) Render(verts []Vertex, primType PrimitiveType, states Ren
 	// #########################################
 
 	// Setup the pointers to the vertices' components
-	/*if len(verts) > 0 {
-		vData := make([]Vector2, len(verts))
-		//cData := make([]byte, len(verts))
-		tData := make([]Vector2, len(verts))
-
-		for i, _ := range verts {
-			vData[i] = verts[i].Pos
-			//cData[i] = verts[i].Color
-			tData[i] = verts[i].TexCoords
+	// ... and if we already used it previously, we don't need to set the pointers again
+	if useVertexCache {
+		if !r.useVertexCache {
+			gl.VertexPointer(2, gl.FLOAT, 0, r.vpCache[:])
+			gl.ColorPointer(4, gl.UNSIGNED_BYTE, 0, r.vcCache[:])
+			gl.TexCoordPointer(2, gl.FLOAT, 0, r.vtCache[:])
 		}
 
-		//const char* data = reinterpret_cast<const char*>(vertices);
-		gl.VertexPointer(2, gl.FLOAT, 0, vData)
-		//gl.ColorPointer(4, gl.UNSIGNED_BYTE, unsafe.Sizeof(Vertex), cData))
-		gl.TexCoordPointer(2, gl.FLOAT, 0, tData)
+		// Find the OpenGL primitive type
+		modes := [...]gl.GLenum{gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.TRIANGLES,
+			gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN, gl.QUADS}
+		mode := modes[primType]
+
+		// Draw the primitives
+		gl.DrawArrays(mode, 0, len(verts))
 	}
-
-	// Find the OpenGL primitive type
-	modes := [...]gl.GLenum{gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.TRIANGLES,
-		gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN, gl.QUADS}
-	mode := modes[primType]
-
-	// Draw the primitives
-	gl.DrawArrays(mode, 0, len(verts))*/
 
 	// Unbind the shader, if any
 	// TODO
