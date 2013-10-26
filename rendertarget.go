@@ -36,7 +36,7 @@ type RenderStates struct {
 }
 
 type RenderTarget struct {
-	Size Vector2
+	size Vector2
 
 	view        *View
 	defaultView *View
@@ -55,10 +55,10 @@ type RenderTarget struct {
 }
 
 func NewRenderTarget(size Vector2) *RenderTarget {
-	rt := &RenderTarget{Size: size}
+	rt := &RenderTarget{size: size}
 	rt.glStatesSet = false
 	rt.defaultView = NewView()
-	rt.defaultView.Reset(Rect{0, 0, rt.Size.X, rt.Size.Y})
+	rt.defaultView.Reset(Rect{0, 0, rt.size.X, rt.size.Y})
 	rt.view = NewView()
 	*(rt.view) = *(rt.defaultView)
 	return rt
@@ -75,6 +75,15 @@ func (r *RenderTarget) SetView(view View) {
 	r.viewChanged = true
 }
 
+func (r *RenderTarget) SetSize(size Vector2) {
+	r.size = size
+	r.defaultView.Reset(Rect{0, 0, r.size.X, r.size.Y})
+}
+
+func (r *RenderTarget) Size() Vector2 {
+	return r.size
+}
+
 func (r *RenderTarget) View() View {
 	return *(r.view)
 }
@@ -84,8 +93,8 @@ func (r *RenderTarget) DefaultView() View {
 }
 
 func (r *RenderTarget) Viewport(view *View) Rect {
-	w := r.Size.X
-	h := r.Size.Y
+	w := r.size.X
+	h := r.size.Y
 	viewport := view.Viewport()
 
 	return Rect{0.5 + w*viewport.Left,
@@ -252,7 +261,7 @@ func (r *RenderTarget) resetGlStates() {
 func (r *RenderTarget) applyCurrentView() {
 	// Set the viewport
 	viewport := r.Viewport(r.view)
-	top := r.Size.Y - (viewport.Top + viewport.H)
+	top := r.size.Y - (viewport.Top + viewport.H)
 	gl.Viewport(int(viewport.Left), int(top), int(viewport.W), int(viewport.H))
 
 	mat := r.view.Transform().Matrix
