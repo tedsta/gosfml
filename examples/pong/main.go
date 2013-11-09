@@ -125,8 +125,12 @@ func (o *Object) Render() {
 // Callbacks
 
 func onResize(wnd *glfw.Window, w, h int) {
-	target.Size.X = float32(w)
-	target.Size.Y = float32(h)
+         tmp1 := target.Size()
+         tmp1.X = float32(w)
+         tmp1.Y = float32(h)
+
+	//target.Size.X = float32(w)
+	//target.Size.Y = float32(h)
 }
 
 func onKey(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
