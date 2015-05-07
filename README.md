@@ -1,7 +1,7 @@
 gosfml
 ======
 
-A rewrite of my favorite multimedia library, SFML, in Google's Golang
+A rewrite of my favorite multimedia library, SFML, in Go.
 
 # Installing Dependencies
 Having installed go with proper [path](http://golang.org/doc/code.html#GOPATH), you will additionally need some Open GL headers and the glfw3 go package. The required headers are [glfw3](http://www.glfw.org/download.html) and [glew](http://glew.sourceforge.net/install.html). Make sure all the C libraries are dynamically linked, as CGO can't handle static libraries.
