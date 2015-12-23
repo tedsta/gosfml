@@ -2,7 +2,7 @@ package sf
 
 import (
 	"errors"
-	"github.com/go-gl/gl"
+	"github.com/go-gl-legacy/gl"
 	"image"
 	"image/png"
 	"os"

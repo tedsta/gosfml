@@ -1,7 +1,7 @@
 package sf
 
 import (
-	"github.com/go-gl/gl"
+	"github.com/go-gl-legacy/gl"
 )
 
 const vertexCacheSize = 4
