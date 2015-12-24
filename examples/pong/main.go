@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	glfw "github.com/go-gl/glfw3"
+	"github.com/go-gl/glfw3/v3.1/glfw"
 	"github.com/tedsta/gosfml"
 )
 
@@ -125,9 +125,9 @@ func (o *Object) Render() {
 // Callbacks
 
 func onResize(wnd *glfw.Window, w, h int) {
-         tmp1 := target.Size()
-         tmp1.X = float32(w)
-         tmp1.Y = float32(h)
+	tmp1 := target.Size()
+	tmp1.X = float32(w)
+	tmp1.Y = float32(h)
 
 	//target.Size.X = float32(w)
 	//target.Size.Y = float32(h)
